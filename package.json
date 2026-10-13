@@ -1,0 +1,23 @@
+{
+  "name": "rikette-desktop",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "packageManager": "pnpm@10.30.2",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --filter desktop dev",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm --filter desktop lint",
+    "test": "pnpm --filter desktop test"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

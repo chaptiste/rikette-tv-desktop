@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rikette</title>
+    <style>
+      /* Same Instant replay palette as src/styles/globals.css. */
+      :root {
+        --background: #070b15;
+        --foreground: #e9edf6;
+        --muted-foreground: #7f8bab;
+        --secondary: #141d31;
+        --border: #1c2740;
+        --primary: #2f6bff;
+        --rec: #ff2d3f;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: var(--background);
+        color: var(--foreground);
+        user-select: none;
+        font-family: 'Archivo Variable', 'Segoe UI', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -webkit-app-region: drag;
+      }
+      body {
+        display: flex;
+        box-sizing: border-box;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 28px;
+        border: 1px solid var(--border);
+      }
+      .logo {
+        width: 52px;
+        height: 52px;
+        margin-bottom: auto;
+        border-radius: 8px;
+      }
+      .brand {
+        font-size: 44px;
+        font-weight: 800;
+        font-stretch: 72%;
+        letter-spacing: -0.01em;
+        line-height: 0.9;
+      }
+      .status {
+        min-height: 14px;
+        color: var(--muted-foreground);
+        font-family: 'Martian Mono Variable', 'Cascadia Mono', monospace;
+        font-stretch: 87.5%;
+        font-size: 10.5px;
+        line-height: 14px;
+        text-transform: uppercase;
+      }
+      .status::before {
+        content: '';
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        margin-right: 8px;
+        border-radius: 50%;
+        background: var(--rec);
+        vertical-align: 1px;
+        animation: blink 1.6s steps(1, end) infinite;
+      }
+      .track {
+        position: relative;
+        width: 100%;
+        height: 4px;
+        overflow: hidden;
+        background: var(--secondary);
+      }
+      .fill {
+        width: 0;
+        height: 100%;
+        background: var(--primary);
+        transition: width 200ms linear;
+      }
+      /* No known percentage yet: a short bar slides across the track. */
+      .track.busy .fill {
+        width: 30%;
+        animation: slide 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+      }
+      @keyframes slide {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(340%);
+        }
+      }
+      @keyframes blink {
+        0%,
+        70% {
+          opacity: 1;
+        }
+        70.01%,
+        100% {
+          opacity: 0.25;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .status::before {
+          animation: none;
+        }
+        .fill {
+          transition: none;
+        }
+        .track.busy .fill {
+          width: 100%;
+          animation: none;
+          opacity: 0.4;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <img class="logo" src="./src/assets/logo.png" alt="" draggable="false" />
+    <span class="brand">Rikette</span>
+    <span class="status" role="status" aria-live="polite">Checking for updates…</span>
+    <div class="track busy" aria-hidden="true"><div class="fill"></div></div>
+    <script type="module" src="./splash.ts"></script>
+  </body>
+</html>

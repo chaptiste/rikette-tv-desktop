@@ -1,0 +1,4 @@
+{
+  "extends": "@echoframe/tsconfig/base.json",
+  "include": ["src"]
+}

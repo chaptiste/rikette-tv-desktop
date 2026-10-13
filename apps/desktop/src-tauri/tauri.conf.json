@@ -1,0 +1,63 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Rikette",
+  "version": "../package.json",
+  "identifier": "tv.rikette.app",
+  "build": {
+    "devUrl": "http://localhost:5174",
+    "frontendDist": "../out/tauri",
+    "beforeDevCommand": "pnpm dev:web",
+    "beforeBuildCommand": "pnpm build:web"
+  },
+  "app": {
+    "windows": [],
+    "security": {
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: efmedia: http://efmedia.localhost https: http:",
+        "media-src": "'self' blob: data: efmedia: http://efmedia.localhost https: http:",
+        "connect-src": "'self' ipc: http://ipc.localhost efmedia: http://efmedia.localhost https: http:"
+      }
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Rikette",
+    "homepage": "https://rikette.tv",
+    "license": "GPL-3.0-or-later",
+    "shortDescription": "Replay buffer recorder for games",
+    "createUpdaterArtifacts": true,
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "../obs-runtime/": "obs/"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "installerIcon": "icons/icon.ico"
+      }
+    }
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": ["rikette"]
+      }
+    },
+    "updater": {
+      "pubkey": "",
+      "windows": {
+        "installMode": "quiet"
+      }
+    }
+  }
+}

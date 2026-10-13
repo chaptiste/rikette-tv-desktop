@@ -1,0 +1,48 @@
+[package]
+name = "rikette"
+description = "Rikette desktop recorder"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+[lib]
+name = "rikette_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+capture-protocol.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+log.workspace = true
+anyhow = "1"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+dirs = "6"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+percent-encoding = "2"
+regex-lite = "0.1"
+reqwest = { version = "0.13", default-features = false, features = ["native-tls", "http2", "json", "stream"] }
+rusqlite = { version = "0.40", features = ["bundled"] }
+tauri = { version = "2.12", features = ["tray-icon", "image-png"] }
+tauri-plugin-autostart = "2.7"
+tauri-plugin-clipboard-manager = "2.4"
+tauri-plugin-deep-link = "2.6"
+tauri-plugin-dialog = "2.8"
+tauri-plugin-global-shortcut = "2.4"
+tauri-plugin-opener = "2.7"
+tauri-plugin-process = "2.4"
+tauri-plugin-single-instance = { version = "2.5", features = ["deep-link"] }
+tauri-plugin-updater = { version = "2.13", default-features = false, features = ["native-tls", "system-proxy"] }
+tokio = { version = "1", features = ["fs", "io-util", "macros", "process", "rt-multi-thread", "sync", "time"] }
+uuid = { version = "1", features = ["v4"] }
+drag = "2.1"
+
+[target.'cfg(windows)'.dependencies]
+# Electron's safeStorage key, to carry the sign-in over from the Electron build.
+aes-gcm = "0.10"
+base64 = "0.22"
+windows = { workspace = true, features = ["Win32_Foundation", "Win32_Security_Cryptography", "Win32_System_Memory"] }

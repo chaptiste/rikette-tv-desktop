@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Rikette mark: a condensed R, the red REC dot and the buffer strip ending at the "now" line. Colours follow design.md. -->
+  <rect width="512" height="512" fill="#070b15"/>
+  <g transform="translate(-30 4)">
+    <path fill="#e9edf6" fill-rule="evenodd" d="M128 64H276C324 64 352 94 352 144V164C352 200 334 226 304 238L362 352H274L228 248H212V352H128Z M212 132V182H256C264 182 268 178 268 170V144C268 136 264 132 256 132Z"/>
+    <circle cx="414" cy="94" r="32" fill="#ff2d3f"/>
+    <g fill="#2f6bff">
+      <rect x="128" y="392" width="36" height="40" opacity="0.3"/>
+      <rect x="174" y="392" width="36" height="40" opacity="0.45"/>
+      <rect x="220" y="392" width="36" height="40" opacity="0.6"/>
+      <rect x="266" y="392" width="36" height="40" opacity="0.8"/>
+      <rect x="312" y="392" width="36" height="40"/>
+    </g>
+    <rect x="356" y="380" width="12" height="64" fill="#ff2d3f"/>
+  </g>
+</svg>
