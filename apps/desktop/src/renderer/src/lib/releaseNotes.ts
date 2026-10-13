@@ -11,6 +11,14 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.1',
+    date: '2026-10-13',
+    title: 'Drag clips into folders again',
+    items: [
+      'You can drag clips onto a folder in Clips again, as well as onto All clips or New folder. This stopped working in 0.2.0.'
+    ]
+  },
+  {
     version: '0.2.0',
     date: '2026-10-13',
     title: 'Lighter, faster, open source',
