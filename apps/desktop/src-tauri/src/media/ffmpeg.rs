@@ -102,6 +102,18 @@ pub async fn write_thumbnail(input: &Path, output: &Path) -> Result<()> {
     run(ffmpeg(), &a).await.map(drop)
 }
 
+/// Windows shows a drag image at its pixel size, so the Discord drag gets its own small one.
+const DRAG_IMAGE_WIDTH: u32 = 160;
+
+pub async fn write_drag_image(thumb: &Path, output: &Path) -> Result<()> {
+    let mut a = args(["-y", "-i"]);
+    a.push(path(thumb));
+    a.extend(args(["-frames:v", "1", "-vf"]));
+    a.push(format!("scale={DRAG_IMAGE_WIDTH}:-2"));
+    a.push(path(output));
+    run(ffmpeg(), &a).await.map(drop)
+}
+
 const PEAK_RATE: f64 = 8000.0;
 pub const PEAK_BUCKETS: usize = 1600;
 pub const PEAK_CACHE_VERSION: u32 = 2;

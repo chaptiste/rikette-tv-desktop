@@ -664,7 +664,8 @@ static DISCORD_BUSY: AtomicBool = AtomicBool::new(false);
 
 struct DiscordExport {
     path: PathBuf,
-    thumb_path: Option<PathBuf>,
+    /// A small copy of the thumbnail; Windows draws drag images at full pixel size.
+    drag_image: Option<PathBuf>,
 }
 
 /// Finished exports by clip id. The page names a clip, never a path, when it starts a drag.
@@ -793,11 +794,24 @@ pub async fn export_for_discord(request: DiscordExportRequest) -> Result<Discord
             _ => None,
         };
         let thumb_url = thumb.as_ref().map(|_| media_protocol::thumb_url(&source.id, now_ms()));
+        let drag_image = match &thumb {
+            Some(thumb) => {
+                let out = std::env::temp_dir().join(format!("rikette-drag-{}.png", source.id));
+                match ffmpeg::write_drag_image(thumb, &out).await {
+                    Ok(()) => Some(out),
+                    Err(error) => {
+                        log::warn!("[rikette] discord drag image failed: {error:#}");
+                        None
+                    }
+                }
+            }
+            None => None,
+        };
         DISCORD_EXPORTS
             .lock()
             .unwrap()
             .get_or_insert_with(HashMap::new)
-            .insert(source.id.clone(), DiscordExport { path: dest.clone(), thumb_path: thumb });
+            .insert(source.id.clone(), DiscordExport { path: dest.clone(), drag_image });
         events::emit(
             "clips:discord-ready",
             DiscordReady { id: source.id.clone(), title: title.clone(), bytes, thumb_url },
@@ -828,18 +842,13 @@ pub fn start_discord_drag(id: &str) {
         return;
     }
     let file = done.path.clone();
-    let icon = done
-        .thumb_path
-        .clone()
-        .unwrap_or_else(|| PathBuf::from("icons/128x128.png"));
+    let icon = match &done.drag_image {
+        Some(path) if path.exists() => drag::Image::File(path.clone()),
+        _ => drag::Image::Raw(include_bytes!("../icons/128x128.png").to_vec()),
+    };
     let Some(win) = events::main_window() else { return };
     let target = win.clone();
     let _ = win.run_on_main_thread(move || {
-        let icon = if icon.is_absolute() {
-            drag::Image::File(icon)
-        } else {
-            drag::Image::Raw(include_bytes!("../icons/128x128.png").to_vec())
-        };
         if let Err(error) = drag::start_drag(
             &target,
             drag::DragItem::Files(vec![file]),

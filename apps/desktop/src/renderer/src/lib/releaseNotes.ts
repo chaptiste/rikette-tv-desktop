@@ -11,6 +11,14 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.4',
+    date: '2026-10-14',
+    title: 'Smaller Discord drag preview',
+    items: [
+      'Dragging a clip into Discord shows a small preview under the cursor instead of a huge see-through picture.'
+    ]
+  },
+  {
     version: '0.2.3',
     date: '2026-10-14',
     title: 'Easier to read',
