@@ -1,5 +1,4 @@
 import '@fontsource-variable/archivo/standard.css'
-import '@fontsource-variable/martian-mono/standard.css'
 
 let hideTimer: ReturnType<typeof setTimeout> | null = null
 let audio: HTMLAudioElement | null = null

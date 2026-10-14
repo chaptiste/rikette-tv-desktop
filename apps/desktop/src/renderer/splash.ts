@@ -1,5 +1,4 @@
 import '@fontsource-variable/archivo/standard.css'
-import '@fontsource-variable/martian-mono/standard.css'
 
 function setStatus(label: string, percent: number | null): void {
   const status = document.querySelector('.status')

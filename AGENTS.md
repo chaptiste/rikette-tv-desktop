@@ -4,7 +4,7 @@ This repository is generated from the private rikette.tv monorepo (`scripts/publ
 
 # UI
 
-The app shares one theme with the website: Instant replay, TV sports replay graphics on deep navy (background `#070b15`, panels `#0c1220`, one accent = replay blue `#2f6bff`, the logo red `#ff2d3f` for live/REPLAY/now; condensed Archivo titles, Martian Mono timecodes; square corners, no gradients, blur, glows or pills). See `design.md`, including its "Never" list.
+The app shares one theme with the website: Instant replay, TV sports replay graphics on deep navy (background `#070b15`, panels `#0c1220`, one accent = replay blue `#2f6bff`, the logo red `#ff2d3f` for live/REPLAY/now; condensed Archivo titles, tabular-figure timecodes; square corners, no gradients, blur, glows or pills). See `design.md`, including its "Never" list.
 
 All colours live in `:root` of `apps/desktop/src/renderer/src/styles/globals.css` (plus copies in `overlay.html` and `splash.html`, which have no Tailwind). Use semantic tokens (`bg-background`, `text-muted-foreground`, `bg-primary`, `bg-rec`, `bg-accent`, `bg-[var(--scrim)]`) — no one-off hex, no `white/…` or `black/…` tints for chrome. Buttons are flat blocks: `Button` default = blue `.btn`, `secondary`/`outline` = outlined `.btn btn-secondary`; cards use `.card`; TV tags use `.bug`; titles use `PageHeader` (`display-title`/`eyebrow`); times and numbers use `.tc`; hotkeys use `Kbd`. Canvas code reads tokens with `getComputedStyle`. Navigation and the window buttons are the top bar in `TopNav.tsx`.
 

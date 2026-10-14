@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '@fontsource-variable/archivo/standard.css';
-@import '@fontsource-variable/martian-mono/standard.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -39,7 +38,6 @@
   --radius-2xl: calc(var(--radius) * 1.5);
   --font-sans: 'Archivo Variable', 'Segoe UI Variable Text', 'Segoe UI', ui-sans-serif, sans-serif;
   --font-display: 'Archivo Variable', 'Segoe UI Variable Display', 'Segoe UI', sans-serif;
-  --font-mono: 'Martian Mono Variable', ui-monospace, 'Cascadia Mono', monospace;
 }
 
 /* Instant replay: TV replay graphics on deep navy. One blue, the logo's red
@@ -172,10 +170,9 @@
     letter-spacing: -0.012em;
     line-height: 0.95;
   }
-  /* Small mono label: timecodes, units, section labels. */
+  /* Small label: timecodes, units, section labels. */
   .eyebrow {
-    font-family: var(--font-mono);
-    font-stretch: 87.5%;
+    font-family: var(--font-sans);
     font-size: 10.5px;
     font-weight: 500;
     letter-spacing: 0.02em;
@@ -183,8 +180,7 @@
     color: var(--muted-foreground);
   }
   .tc {
-    font-family: var(--font-mono);
-    font-stretch: 87.5%;
+    font-family: var(--font-sans);
     font-variant-numeric: tabular-nums;
   }
 
@@ -258,8 +254,7 @@
     padding: 4px 9px;
     background: var(--scrim);
     color: var(--foreground);
-    font-family: var(--font-mono);
-    font-stretch: 87.5%;
+    font-family: var(--font-sans);
     font-weight: 500;
     font-size: 11px;
     letter-spacing: 0;
@@ -275,8 +270,7 @@
     border-bottom-width: 2px;
     background: var(--secondary);
     color: var(--foreground);
-    font-family: var(--font-mono);
-    font-stretch: 87.5%;
+    font-family: var(--font-sans);
     font-weight: 600;
     text-transform: uppercase;
   }
