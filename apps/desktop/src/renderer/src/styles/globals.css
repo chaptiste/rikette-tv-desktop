@@ -173,7 +173,7 @@
   /* Small label: timecodes, units, section labels. */
   .eyebrow {
     font-family: var(--font-sans);
-    font-size: 10.5px;
+    font-size: 11.5px;
     font-weight: 500;
     letter-spacing: 0.02em;
     text-transform: uppercase;

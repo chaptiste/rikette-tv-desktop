@@ -128,7 +128,7 @@ export function Home(): React.JSX.Element {
             <h1 className="display-title text-[52px]">{titles[mode]}</h1>
             <p className="display-title mt-1 text-[22px] text-muted-foreground">{sublines[mode]}</p>
           </div>
-          <div className="tc shrink-0 pb-1 text-right text-[10.5px] leading-[1.8] text-muted-foreground">
+          <div className="tc shrink-0 pb-1 text-right text-[12px] leading-[1.7] text-muted-foreground">
             <p>
               {encoderName(capture?.encoderLabel ?? '')} ·{' '}
               <span className="text-foreground">{outputDetail(capture) ?? '—'}</span>
@@ -140,7 +140,7 @@ export function Home(): React.JSX.Element {
         </div>
 
         {capture?.error ? (
-          <p className="border-l-2 border-destructive bg-destructive/10 px-3 py-2 text-[12.5px] text-destructive">
+          <p className="border-l-2 border-destructive bg-destructive/10 px-3 py-2 text-[13px] text-destructive">
             {capture.error}
           </p>
         ) : null}
@@ -203,7 +203,7 @@ export function Home(): React.JSX.Element {
             type="button"
             onClick={() => setRebinding((value) => !value)}
             className={cn(
-              'tc ml-auto text-right text-[10.5px] leading-[1.7] text-muted-foreground transition-colors hover:text-foreground',
+              'tc ml-auto text-right text-[12px] leading-[1.6] text-muted-foreground transition-colors hover:text-foreground',
               rebinding && 'text-highlight hover:text-highlight'
             )}
           >
@@ -405,7 +405,7 @@ function BufferRuler(props: {
         })}
         <span className="absolute -top-1.5 -bottom-1.5 right-0 w-0.5 bg-rec" />
       </div>
-      <div className="tc mt-2 flex justify-between text-[10px] text-muted-foreground">
+      <div className="tc mt-2 flex justify-between text-[11.5px] text-muted-foreground">
         {labels.map((label) => (
           <span key={label}>−{label}</span>
         ))}
@@ -449,7 +449,7 @@ function TowerRow(props: {
       >
         <span
           className={cn(
-            'tc text-[11px] font-semibold',
+            'tc text-[12px] font-semibold',
             props.fresh ? 'text-primary' : 'text-muted-foreground'
           )}
         >
@@ -459,15 +459,15 @@ function TowerRow(props: {
           {clip.thumbUrl ? (
             <img src={clip.thumbUrl} alt="" className="size-full object-cover" />
           ) : null}
-          <span className="tc absolute right-0.5 bottom-0.5 bg-[var(--scrim)] px-1 text-[9px]">
+          <span className="tc absolute right-0.5 bottom-0.5 bg-[var(--scrim)] px-1 text-[11px]">
             {formatDuration(clip.durationMs)}
           </span>
         </span>
         <span className="min-w-0">
-          <span className="block truncate font-display text-[14px] leading-tight font-bold">
+          <span className="block truncate font-display text-[15px] leading-tight font-bold">
             {clip.title}
           </span>
-          <span className="tc mt-0.5 block truncate text-[10px] text-muted-foreground">
+          <span className="tc mt-1 block truncate text-[12px] text-muted-foreground">
             {[clip.gameTitle, formatAgo(clip.createdAt, props.now)].filter(Boolean).join(' · ')}
             {clip.cloudStatus === 'uploading' ? (
               <span className="text-highlight"> · uploading</span>

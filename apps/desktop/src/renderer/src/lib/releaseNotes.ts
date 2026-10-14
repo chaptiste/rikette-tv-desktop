@@ -11,6 +11,14 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.3',
+    date: '2026-10-14',
+    title: 'Easier to read',
+    items: [
+      'Small text is bigger across the app: section labels everywhere, and on Replay the clip details, durations, buffer timeline and hotkey hint.'
+    ]
+  },
+  {
     version: '0.2.1',
     date: '2026-10-13',
     title: 'Drag clips into folders again',
