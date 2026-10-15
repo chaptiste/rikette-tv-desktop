@@ -12,6 +12,7 @@ export {
   protocolUrl
 } from './brand'
 export { CLIP_ID_LENGTH, clipPagePath, createClipId } from './clipId'
+export { LEGAL } from './legal'
 export {
   CLOUD_AUDIO_CODEC,
   CLOUD_CONTAINER,
