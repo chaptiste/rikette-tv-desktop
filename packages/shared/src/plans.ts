@@ -1,5 +1,7 @@
 export const FREE_CLOUD_CLIPS = 3
 export const PRO_BYTES = 150 * 1024 ** 3
+// After Pro ends, clips over the free limit are kept this long, then deleted.
+export const CLEANUP_GRACE_DAYS = 30
 export const PRO_PRICE_MONTHLY_USD = 4.99
 export const PRO_PRICE_YEARLY_USD = 39
 export const MAX_UPLOAD_BYTES = 500 * 1024 * 1024

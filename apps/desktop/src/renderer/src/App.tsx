@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Route, Routes, useLocation, useNavigate } from 'react-router'
 import { AppAlerts } from './components/AppAlerts'
+import { CleanupBanner } from './components/CleanupBanner'
 import { DiscordExportCard } from './components/DiscordExportCard'
 import { ReleaseNotes } from './components/ReleaseNotes'
 import { TopNav } from './components/TopNav'
@@ -33,6 +34,7 @@ export default function App(): React.JSX.Element {
         <ReleaseNotes />
         <DiscordExportCard />
         <TopNav />
+        <CleanupBanner />
         <div key={pageKey} className="page-enter relative min-h-0 flex-1">
           <Routes location={location}>
             <Route path="/" element={<Home />} />

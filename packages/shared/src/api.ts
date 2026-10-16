@@ -54,7 +54,10 @@ export const meSchema = z.object({
   usedBytes: z.number().int().nonnegative(),
   clipCount: z.number().int().nonnegative(),
   freeClipLimit: z.number().int().nonnegative(),
-  storageCap: z.number().int().nonnegative()
+  storageCap: z.number().int().nonnegative(),
+  // Pro ended with more clips than the free plan keeps: when the extra ones go.
+  cleanupAt: z.number().int().nullable().optional(),
+  cleanupClips: z.number().int().nonnegative().optional()
 })
 export type Me = z.infer<typeof meSchema>
 

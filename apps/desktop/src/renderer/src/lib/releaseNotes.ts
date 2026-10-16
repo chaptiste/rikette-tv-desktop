@@ -11,6 +11,14 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.5',
+    date: '2026-10-16',
+    title: 'Heads-up when Pro ends',
+    items: [
+      'If your Pro plan ends while you have more cloud clips than the free plan keeps, a banner under the top bar tells you how many will be deleted from the cloud and when, with a button to renew. Clips on your PC are never touched.'
+    ]
+  },
+  {
     version: '0.2.4',
     date: '2026-10-14',
     title: 'Smaller Discord drag preview',
