@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { DEFAULT_HOTKEY, formatHotkey } from '@echoframe/shared'
+import { DEFAULT_HOTKEY, formatHotkey, type AppSettings } from '@echoframe/shared'
 import { Loader2, Pause, Play, RotateCw } from 'lucide-react'
 import { toast } from 'sonner'
+import { PageHeader } from '@/components/PageHeader'
 import { Button } from '@/components/ui/button'
 import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { eventToAccelerator } from '@/lib/accelerator'
 import { recMode, useCaptureStatus, type RecMode } from '@/lib/capture'
-import { formatAgo, formatClock, formatDuration } from '@/lib/formats'
+import { formatAgo, formatBytes, formatDuration } from '@/lib/formats'
 import { hasDesktopApi, ipc } from '@/lib/ipc'
 import { cn } from '@/lib/utils'
 import type { LibraryClip, CaptureStatus } from '../../../tauri/api'
@@ -21,7 +22,7 @@ const titles: Record<RecMode, string> = {
 }
 
 const sublines: Record<RecMode, string> = {
-  recording: 'Nothing gets lost. Hit the key when it happens.',
+  recording: 'Recording in the background. Save a replay whenever you need it.',
   paused: 'The buffer is empty until you resume.',
   starting: 'Starting the replay buffer.',
   saving: 'Writing the last seconds to disk.',
@@ -34,31 +35,57 @@ const FRESH_MS = 2 * 60_000
 export function Home(): React.JSX.Element {
   const navigate = useNavigate()
   const [capture, setCapture] = useCaptureStatus()
+  const [settings, setSettings] = useState<AppSettings | null>(null)
+  const [clips, setClips] = useState<LibraryClip[]>([])
+  const [clipsError, setClipsError] = useState<string | null>(null)
+  const [settingsError, setSettingsError] = useState<string | null>(null)
   const [hotkey, setHotkey] = useState(DEFAULT_HOTKEY)
   const [rebinding, setRebinding] = useState(false)
   const [busy, setBusy] = useState(false)
   const [recent, setRecent] = useState<LibraryClip[]>([])
   const [justSaved, setJustSaved] = useState<LibraryClip | null>(null)
   const newestId = useRef<string | null | undefined>(undefined)
-  const now = useNow(1000)
+  const now = useNow(30_000)
 
   useEffect(() => {
     if (!hasDesktopApi()) return
-    void ipc.getSettings().then((settings) => setHotkey(settings.hotkey))
+    const loadSettings = (): void => {
+      void ipc
+        .getSettings()
+        .then((value) => {
+          setSettings(value)
+          setSettingsError(null)
+          setHotkey(value.hotkey)
+        })
+        .catch(() =>
+          setSettingsError('Could not load capture settings. Reopen the dashboard to retry.')
+        )
+    }
+    loadSettings()
+    window.addEventListener('focus', loadSettings)
     const loadClips = (): void => {
-      void ipc.listClips().then((clips) => {
-        const sorted = [...clips].sort((a, b) => b.createdAt - a.createdAt)
-        const newest = sorted[0] ?? null
-        // A clip that shows up while this page is open gets the "clip saved" lower third.
-        if (newestId.current !== undefined && newest && newest.id !== newestId.current) {
-          setJustSaved(newest)
-        }
-        newestId.current = newest?.id ?? null
-        setRecent(sorted.slice(0, 6))
-      })
+      void ipc
+        .listClips()
+        .then((clips) => {
+          const sorted = [...clips].sort((a, b) => b.createdAt - a.createdAt)
+          const newest = sorted[0] ?? null
+          // A clip that shows up while this page is open gets the "clip saved" lower third.
+          if (newestId.current !== undefined && newest && newest.id !== newestId.current) {
+            setJustSaved(newest)
+          }
+          newestId.current = newest?.id ?? null
+          setClips(sorted)
+          setRecent(sorted.slice(0, 4))
+          setClipsError(null)
+        })
+        .catch(() => setClipsError('Could not load your clips. Reopen the dashboard to retry.'))
     }
     loadClips()
-    return ipc.onClipsChanged(loadClips)
+    const unsubscribe = ipc.onClipsChanged(loadClips)
+    return () => {
+      unsubscribe()
+      window.removeEventListener('focus', loadSettings)
+    }
   }, [])
 
   useEffect(() => {
@@ -96,7 +123,13 @@ export function Home(): React.JSX.Element {
   const live = mode === 'recording' || mode === 'saving'
   const target = capture?.captureTarget
   const capturingGame = target?.kind === 'game' && Boolean(target.exe)
-  const sourceName = capturingGame ? target.title || target.exe : 'Desktop'
+  const sourceName = !capture?.ready
+    ? 'Unavailable'
+    : capturingGame
+      ? target.title || target.exe
+      : target?.kind === 'display'
+        ? target.title || 'Display capture'
+        : 'Waiting for a game'
   const hotkeyParts = formatHotkey(hotkey, hasDesktopApi() ? ipc.platform : 'win32').split(' + ')
   const last = recent[0] ?? null
 
@@ -105,6 +138,8 @@ export function Home(): React.JSX.Element {
     setBusy(true)
     try {
       setCapture(capture?.paused ? await ipc.resumeBuffer() : await ipc.pauseBuffer())
+    } catch (error) {
+      toast.error('Recorder action failed', { description: String(error) })
     } finally {
       setBusy(false)
     }
@@ -115,55 +150,32 @@ export function Home(): React.JSX.Element {
     setBusy(true)
     try {
       setCapture(await ipc.restartCapture())
+    } catch (error) {
+      toast.error('Recorder action failed', { description: String(error) })
     } finally {
       setBusy(false)
     }
   }
 
   return (
-    <main className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)_320px]">
-      <section className="flex min-h-0 min-w-0 flex-col gap-4 overflow-y-auto px-7 pt-6 pb-5">
-        <div className="flex items-end justify-between gap-6">
-          <div key={mode} className="slide-in-left min-w-0">
-            <h1 className="display-title text-[52px]">{titles[mode]}</h1>
-            <p className="display-title mt-1 text-[22px] text-muted-foreground">{sublines[mode]}</p>
-          </div>
-          <div className="tc shrink-0 pb-1 text-right text-[12px] leading-[1.7] text-muted-foreground">
-            <p>
-              {encoderName(capture?.encoderLabel ?? '')} ·{' '}
-              <span className="text-foreground">{outputDetail(capture) ?? '—'}</span>
-            </p>
-            <p>
-              SOURCE · <span className="text-foreground">{sourceName}</span>
-            </p>
-          </div>
-        </div>
-
-        {capture?.error ? (
-          <p className="border-l-2 border-destructive bg-destructive/10 px-3 py-2 text-[13px] text-destructive">
-            {capture.error}
-          </p>
-        ) : null}
-
-        <LastReplay
-          clip={last}
-          now={now}
-          saving={mode === 'saving'}
-          justSaved={justSaved}
-          hotkeyParts={hotkeyParts}
-          onOpen={(clip) => navigate(`/editor/${clip.id}`)}
-        />
-
-        <BufferRuler capture={capture} mode={mode} now={now} />
-
-        <div className="flex items-center gap-3 pt-1">
+    <main className="flex h-full min-h-0 flex-col">
+      <PageHeader
+        title={titles[mode]}
+        kicker="Replay dashboard"
+        className="items-center px-6 pt-4 pb-2"
+      >
+        <div className="ml-auto flex items-center gap-2">
           <Button
-            size="xl"
-            className="min-w-[220px] justify-between"
+            size="lg"
+            className="min-w-[190px] justify-between"
             disabled={!live || capture?.saving}
             onClick={() => {
               if (!hasDesktopApi()) return
-              void ipc.saveClip()
+              void ipc
+                .saveClip()
+                .catch((error: unknown) =>
+                  toast.error('Could not save clip', { description: String(error) })
+                )
             }}
           >
             {capture?.saving ? (
@@ -184,13 +196,13 @@ export function Home(): React.JSX.Element {
             )}
           </Button>
           {mode === 'offline' ? (
-            <Button size="xl" variant="outline" disabled={busy} onClick={() => void restart()}>
+            <Button size="lg" variant="outline" disabled={busy} onClick={() => void restart()}>
               <RotateCw />
               Restart
             </Button>
           ) : (
             <Button
-              size="xl"
+              size="lg"
               variant="outline"
               disabled={busy || mode === 'starting'}
               onClick={() => void toggleBuffer()}
@@ -199,70 +211,122 @@ export function Home(): React.JSX.Element {
               {mode === 'paused' ? 'Resume' : 'Pause'}
             </Button>
           )}
-          <button
-            type="button"
-            onClick={() => setRebinding((value) => !value)}
-            className={cn(
-              'tc ml-auto text-right text-[12px] leading-[1.6] text-muted-foreground transition-colors hover:text-foreground',
-              rebinding && 'text-highlight hover:text-highlight'
-            )}
-          >
-            {rebinding ? (
-              <>
-                PRESS A NEW KEY COMBO…
-                <br />
-                ESC TO CANCEL
-              </>
-            ) : (
-              <>
-                WORKS IN-GAME, NO ALT-TAB
-                <br />
-                <span className="underline decoration-border-strong underline-offset-3">
-                  CHANGE HOTKEY
-                </span>
-              </>
-            )}
-          </button>
         </div>
-      </section>
-
-      <aside className="flex min-h-0 flex-col border-l border-border bg-card">
-        <div className="flex items-baseline justify-between px-4 pt-5 pb-3">
-          <h2 className="display-title text-[24px]">Latest clips</h2>
-          <button
-            type="button"
-            onClick={() => navigate('/library')}
-            className="eyebrow transition-colors hover:text-foreground"
-          >
-            All clips →
-          </button>
-        </div>
-        <ol className="min-h-0 flex-1 overflow-y-auto">
-          {recent.length > 0 ? (
-            recent.map((clip, index) => (
-              <TowerRow
-                key={clip.id}
-                clip={clip}
-                index={index}
-                position={recent.length - index}
-                fresh={now - clip.createdAt < FRESH_MS}
-                now={now}
-                onOpen={() => navigate(`/editor/${clip.id}`)}
-              />
-            ))
-          ) : (
-            <li className="border-t border-border px-4 py-6 text-[12.5px] text-muted-foreground">
-              Your clips show up here, newest first.
-            </li>
-          )}
-        </ol>
-        <dl className="grid grid-cols-2 border-t border-border">
-          <SysCell label="Buffer" value={`${capture?.bufferSec ?? 60} s`} />
-          <SysCell label="Quality" value={outputDetail(capture) ?? '—'} />
-          <SysCell label="Encoder" value={encoderName(capture?.encoderLabel ?? '')} />
-          <SysCell label={capturingGame ? 'Game' : 'Source'} value={sourceName} />
-        </dl>
-      </aside>
+      </PageHeader>
+      <p className="shrink-0 px-6 pb-3 text-sm text-muted-foreground">{sublines[mode]}</p>
+      {capture?.error || settingsError || clipsError ? (
+        <p
+          role="alert"
+          className="mx-6 mb-3 max-h-12 shrink-0 overflow-y-auto border-l-2 border-destructive pl-3 text-sm text-destructive"
+        >
+          {capture?.error || settingsError || clipsError}
+        </p>
+      ) : null}
+      <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_300px] gap-4 px-6 pb-4">
+        <section className="card flex min-h-0 min-w-0 flex-col" aria-labelledby="recent-title">
+          <div className="flex shrink-0 items-center justify-between px-4 py-2.5">
+            <h2 id="recent-title" className="font-display text-lg font-bold">
+              Latest replay
+            </h2>
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => navigate('/library')}
+            >
+              All clips
+            </button>
+          </div>
+          <LastReplay
+            clip={last}
+            now={now}
+            justSaved={justSaved}
+            hotkeyParts={hotkeyParts}
+            onOpen={(clip) => navigate(`/editor/${clip.id}`)}
+          />
+          {recent.length > 1 ? (
+            <ol className="shrink-0" aria-label="Earlier clips">
+              {recent.slice(1).map((clip, index) => (
+                <TowerRow
+                  key={clip.id}
+                  clip={clip}
+                  index={index}
+                  position={index + 2}
+                  fresh={now - clip.createdAt < FRESH_MS}
+                  now={now}
+                  onOpen={() => navigate(`/editor/${clip.id}`)}
+                />
+              ))}
+            </ol>
+          ) : null}
+        </section>
+        <aside className="card flex min-h-0 min-w-0 flex-col" aria-labelledby="setup-title">
+          <div className="flex shrink-0 items-center justify-between px-4 py-2.5">
+            <h2 id="setup-title" className="font-display text-lg font-bold">
+              Capture setup
+            </h2>
+            <button
+              type="button"
+              className="text-xs text-muted-foreground hover:text-foreground"
+              onClick={() => navigate('/settings')}
+            >
+              Edit settings
+            </button>
+          </div>
+          <dl className="mx-4 shrink-0 divide-y divide-border border-t border-border">
+            <SetupRow label="Source" value={sourceName} />
+            <SetupRow
+              label="Replay"
+              value={capture ? `${capture.bufferSec} seconds` : 'Unavailable'}
+            />
+            <SetupRow label="Output" value={outputDetail(capture) ?? 'Unavailable'} />
+            <SetupRow label="Encoder" value={encoderName(capture?.encoderLabel ?? '')} />
+            <SetupRow
+              label="Microphone"
+              value={
+                settings
+                  ? settings.micEnabled
+                    ? `On / ${settings.micVolume}%`
+                    : 'Off'
+                  : 'Unavailable'
+              }
+            />
+          </dl>
+          <div className="mx-4 flex shrink-0 items-center justify-between gap-2 border-t border-border py-2.5">
+            <span className="text-sm text-muted-foreground">Hotkey</span>
+            <button
+              type="button"
+              onClick={() => setRebinding((value) => !value)}
+              className="text-right text-xs text-highlight hover:underline"
+            >
+              {rebinding ? (
+                'Press keys / Esc to cancel'
+              ) : (
+                <>
+                  <span className="tc">{hotkeyParts.join(' + ')}</span> / Change
+                </>
+              )}
+            </button>
+          </div>
+          <div className="mt-auto border-t border-border px-4 py-3">
+            <p className="tc text-xs">
+              {clips.length} clips /{' '}
+              {formatBytes(
+                clips.filter((clip) => clip.localFile).reduce((sum, clip) => sum + clip.bytes, 0)
+              )}{' '}
+              local
+              {clips.some((clip) => clip.cloudStatus === 'uploading')
+                ? ` / ${clips.filter((clip) => clip.cloudStatus === 'uploading').length} uploading`
+                : ''}
+            </p>
+            <p
+              className="mt-1 truncate text-xs text-muted-foreground"
+              title={settings?.outputFolder}
+            >
+              Saved to {settings?.outputFolder ?? 'your clip folder'}
+            </p>
+          </div>
+        </aside>
+      </div>
     </main>
   )
 }
@@ -271,14 +335,13 @@ export function Home(): React.JSX.Element {
 function LastReplay(props: {
   clip: LibraryClip | null
   now: number
-  saving: boolean
   justSaved: LibraryClip | null
   hotkeyParts: string[]
   onOpen: (clip: LibraryClip) => void
 }): React.JSX.Element {
   const clip = props.clip
   return (
-    <div className="relative aspect-video max-h-[46vh] min-h-[180px] w-full shrink-0 self-start overflow-hidden bg-black outline-1 outline-border-strong">
+    <div className="relative min-h-0 flex-1 overflow-hidden bg-background">
       {clip ? (
         <button
           type="button"
@@ -329,15 +392,8 @@ function LastReplay(props: {
         </div>
       )}
 
-      {props.saving ? (
-        <span
-          aria-hidden
-          className="flash-save pointer-events-none absolute inset-0 bg-foreground"
-        />
-      ) : null}
-
       {props.justSaved ? (
-        <div className="slide-in-left pointer-events-none absolute top-3 left-1/2 flex -translate-x-1/2 items-stretch shadow-[0_12px_30px_var(--shadow)]">
+        <div className="slide-in-left pointer-events-none absolute top-3 left-1/2 flex -translate-x-1/2 items-stretch">
           <span className="grid place-items-center bg-primary px-3 font-display text-[22px] font-black">
             +{formatDuration(props.justSaved.durationMs)}
           </span>
@@ -351,77 +407,6 @@ function LastReplay(props: {
       ) : null}
     </div>
   )
-}
-
-/**
- * The rolling buffer as a strip of one-second cells. It fills from the left
- * after a (re)start; once full, a marker every ten seconds slides left so you
- * can see time passing through it. The red line is now.
- */
-function BufferRuler(props: {
-  capture: CaptureStatus | null
-  mode: RecMode
-  now: number
-}): React.JSX.Element {
-  const total = props.capture?.bufferSec ?? 60
-  const cells = Math.min(total, 60)
-  const perCell = total / cells
-  const since = props.capture?.bufferedSince ?? null
-  const live = props.mode === 'recording' || props.mode === 'saving'
-  const filledSec = live && since ? Math.min(total, (props.now - since) / 1000) : 0
-  const filled = Math.floor(filledSec / perCell)
-  const shift = Math.floor(props.now / 1000 / perCell)
-  const labels = rulerLabels(total)
-
-  return (
-    <div className="shrink-0">
-      <div className="mb-2 flex items-baseline justify-between">
-        <p className="eyebrow">
-          In buffer ·{' '}
-          <span className={live ? 'text-foreground' : undefined}>
-            {formatClock(filledSec)} / {formatClock(total)}
-          </span>
-        </p>
-        <p className="eyebrow">{live ? 'Rolling' : props.mode === 'paused' ? 'Paused' : '—'}</p>
-      </div>
-      <div className="relative flex h-10 gap-[2px] pr-1">
-        {Array.from({ length: cells }, (_, index) => {
-          // index 0 is the oldest second, the last cell is now
-          const age = cells - 1 - index
-          const on = age < filled
-          const marker = on && filled >= cells && (index + shift) % 10 === 0
-          return (
-            <span
-              key={on && age === 0 ? `lead-${filled}` : index}
-              className={cn(
-                'flex-1 transition-colors duration-300',
-                on ? 'bg-primary' : 'bg-secondary',
-                on && age === 0 && filled < cells && 'cell-fill',
-                marker && 'bg-highlight'
-              )}
-              style={on ? { opacity: 0.6 + 0.4 * (1 - age / cells) } : undefined}
-            />
-          )
-        })}
-        <span className="absolute -top-1.5 -bottom-1.5 right-0 w-0.5 bg-rec" />
-      </div>
-      <div className="tc mt-2 flex justify-between text-[11.5px] text-muted-foreground">
-        {labels.map((label) => (
-          <span key={label}>−{label}</span>
-        ))}
-        <span className="text-rec">NOW</span>
-      </div>
-    </div>
-  )
-}
-
-/** Six evenly spaced "seconds ago" labels for the ruler, oldest first. */
-function rulerLabels(total: number): string[] {
-  const steps = 6
-  return Array.from({ length: steps }, (_, index) => {
-    const seconds = Math.round(total - (total / steps) * index)
-    return seconds >= 120 && seconds % 60 === 0 ? `${seconds / 60}m` : `${seconds}`
-  })
 }
 
 /** One clip in the list, like a row in a race timing tower. */
@@ -443,7 +428,7 @@ function TowerRow(props: {
         type="button"
         onClick={props.onOpen}
         className={cn(
-          'grid w-full grid-cols-[22px_80px_minmax(0,1fr)] items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-accent',
+          'grid w-full grid-cols-[22px_64px_minmax(0,1fr)] items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-accent',
           props.fresh && 'bg-popover shadow-[inset_3px_0_0_var(--primary)]'
         )}
       >
@@ -455,7 +440,7 @@ function TowerRow(props: {
         >
           {props.position.toString().padStart(2, '0')}
         </span>
-        <span className="relative aspect-video w-20 overflow-hidden bg-black">
+        <span className="relative aspect-video w-16 overflow-hidden bg-card">
           {clip.thumbUrl ? (
             <img src={clip.thumbUrl} alt="" className="size-full object-cover" />
           ) : null}
@@ -481,11 +466,11 @@ function TowerRow(props: {
   )
 }
 
-function SysCell(props: { label: string; value: string }): React.JSX.Element {
+function SetupRow(props: { label: string; value: string }): React.JSX.Element {
   return (
-    <div className="min-w-0 border-border px-4 py-2.5 odd:border-r [&:nth-child(-n+2)]:border-b">
-      <dt className="eyebrow">{props.label}</dt>
-      <dd className="truncate font-display text-[16px] font-bold" title={props.value}>
+    <div className="grid grid-cols-[85px_minmax(0,1fr)] gap-3 py-2 text-sm">
+      <dt className="text-muted-foreground">{props.label}</dt>
+      <dd className="tc truncate text-right" title={props.value}>
         {props.value}
       </dd>
     </div>

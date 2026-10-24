@@ -367,16 +367,6 @@
   }
 }
 
-/* the rolling buffer's leading cell */
-@keyframes cell-fill {
-  from {
-    transform: scaleY(0.2);
-  }
-  to {
-    transform: none;
-  }
-}
-
 .page-enter {
   animation: page-in 260ms cubic-bezier(0.65, 0, 0.35, 1) both;
 }
@@ -393,10 +383,6 @@
 }
 .flash-save {
   animation: flash-save 450ms ease-out both;
-}
-.cell-fill {
-  transform-origin: bottom;
-  animation: cell-fill 300ms ease-out both;
 }
 
 /* Children of .stagger come in one after another. */

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { hasDesktopApi, ipc } from '@/lib/ipc'
 
 const links = [
-  { to: '/', label: 'Replay' },
+  { to: '/', label: 'Dashboard' },
   { to: '/library', label: 'Clips' },
   { to: '/editor', label: 'Editor' },
   { to: '/settings', label: 'Settings' },

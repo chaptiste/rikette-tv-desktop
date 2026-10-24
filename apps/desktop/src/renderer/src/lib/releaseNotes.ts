@@ -11,6 +11,16 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.6',
+    date: '2026-10-24',
+    title: 'Your replays at a glance',
+    items: [
+      'The new Dashboard brings your latest replay, three earlier clips and capture settings into one screen, with no scrolling at the minimum window size.',
+      'Save a clip, pause or resume recording, restart the recorder and change your hotkey directly from the dashboard.',
+      'See your capture source, replay length, video output, encoder, microphone and local library usage. The animated buffer timeline has been removed.'
+    ]
+  },
+  {
     version: '0.2.5',
     date: '2026-10-16',
     title: 'Heads-up when Pro ends',
