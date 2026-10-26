@@ -141,8 +141,10 @@ pub fn capture_restart() -> engine::CaptureStatus {
     engine::status()
 }
 
+/// Async so it runs off the main thread: the first save creates the HUD window, and
+/// creating a webview inside a sync command deadlocks WebView2 on Windows.
 #[tauri::command]
-pub fn clips_save() {
+pub async fn clips_save() {
     hotkey::request_save_clip(hotkey::SaveReason::Ui);
 }
 

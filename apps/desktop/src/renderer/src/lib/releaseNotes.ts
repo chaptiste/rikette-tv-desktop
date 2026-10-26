@@ -11,6 +11,12 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.8',
+    date: '2026-10-26',
+    title: 'Clip it fix',
+    items: ['Fixed the Clip it button freezing the app instead of saving a clip.']
+  },
+  {
     version: '0.2.7',
     date: '2026-10-26',
     title: 'A new look',
