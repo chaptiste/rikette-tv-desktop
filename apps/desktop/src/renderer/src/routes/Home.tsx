@@ -277,7 +277,16 @@ function ClipCard(props: {
   const clip = props.clip
   return (
     <li className="rise-in" style={{ '--i': props.index } as React.CSSProperties}>
-      <button type="button" onClick={props.onOpen} className="group block w-full text-left">
+      <button
+        type="button"
+        onClick={props.onOpen}
+        onContextMenu={(event) => {
+          event.preventDefault()
+          if (!hasDesktopApi()) return
+          void ipc.clipMenu(clip.id)
+        }}
+        className="group block w-full text-left"
+      >
         <span
           className={cn(
             'relative block aspect-video overflow-hidden bg-black outline-1 outline-border transition-[outline-color] duration-150 group-hover:outline-2 group-hover:outline-primary',
