@@ -10,6 +10,14 @@ export interface AudioDevices {
   inputs: AudioDeviceInfo[]
 }
 
+/** A window that window mode can record. */
+export interface WindowInfo {
+  /** OBS's `title:class:exe` id, stored as `captureWindow`. */
+  id: string
+  title: string
+  exe: string
+}
+
 export interface DisplayInfo {
   id: number
   index: number
@@ -25,7 +33,7 @@ export interface SettingsUpdateResult {
 }
 
 export interface CaptureTarget {
-  kind: 'game' | 'display'
+  kind: 'game' | 'display' | 'window'
   exe: string
   title: string
 }
@@ -152,6 +160,7 @@ export interface EchoFrameApi {
   hotkeyRegistered: () => Promise<boolean>
   listDisplays: () => Promise<DisplayInfo[]>
   listAudioDevices: () => Promise<AudioDevices>
+  listWindows: () => Promise<WindowInfo[]>
   pickOutputFolder: () => Promise<AppSettings>
   getCaptureStatus: () => Promise<CaptureStatus>
   pauseBuffer: () => Promise<CaptureStatus>

@@ -91,11 +91,11 @@ pub fn current() -> Option<FullscreenApp> {
     best.map(|(app, _)| app)
 }
 
-fn wide(buf: &[u16], len: i32) -> String {
+pub(super) fn wide(buf: &[u16], len: i32) -> String {
     String::from_utf16_lossy(&buf[..len.max(0) as usize])
 }
 
-fn clean(text: &str) -> String {
+pub(super) fn clean(text: &str) -> String {
     text.replace(['\t', '\n'], " ").replace('\r', "").trim().to_string()
 }
 
@@ -165,7 +165,7 @@ fn try_game(hwnd: HWND, own_pid: u32, unknown_ok: bool) -> Option<(FullscreenApp
     }
 }
 
-fn cloaked(hwnd: HWND) -> bool {
+pub(super) fn cloaked(hwnd: HWND) -> bool {
     let mut value = 0i32;
     let result = unsafe {
         DwmGetWindowAttribute(
@@ -179,7 +179,7 @@ fn cloaked(hwnd: HWND) -> bool {
 }
 
 /// `game.exe` for a process id, or None when it cannot be opened.
-fn exe_name(pid: u32) -> Option<String> {
+pub(super) fn exe_name(pid: u32) -> Option<String> {
     unsafe {
         let process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid).ok()?;
         let mut buf = [0u16; 1024];

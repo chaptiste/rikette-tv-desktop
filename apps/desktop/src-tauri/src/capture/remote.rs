@@ -9,7 +9,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use anyhow::{anyhow, bail, Context, Result};
-use capture_protocol::{AudioDevices, Call, FromHost, HostState, LogLevel, StartRequest, ToHost};
+use capture_protocol::{AudioDevices, Call, FromHost, HostState, LogLevel, StartRequest, ToHost, WindowInfo};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, ChildStdin, Command};
 use tokio::sync::{mpsc, oneshot};
@@ -90,6 +90,10 @@ pub async fn save() -> Result<PathBuf> {
 
 pub async fn list_audio_devices() -> Result<AudioDevices> {
     Ok(serde_json::from_value(call(Call::ListAudioDevices).await?)?)
+}
+
+pub async fn list_windows() -> Result<Vec<WindowInfo>> {
+    Ok(serde_json::from_value(call(Call::ListWindows).await?)?)
 }
 
 pub fn set_mic_volume(percent: u32) {

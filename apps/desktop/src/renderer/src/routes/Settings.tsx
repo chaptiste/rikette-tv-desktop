@@ -31,7 +31,7 @@ import { PageHeader } from '@/components/PageHeader'
 import { eventToAccelerator } from '@/lib/accelerator'
 import { hasDesktopApi, ipc } from '@/lib/ipc'
 import { cn } from '@/lib/utils'
-import type { DisplayInfo, CaptureStatus, AudioDeviceInfo } from '../../../tauri/api'
+import type { DisplayInfo, CaptureStatus, AudioDeviceInfo, WindowInfo } from '../../../tauri/api'
 
 const captureModes: { value: CaptureMode; label: string }[] = [
   { value: 'auto-game', label: 'Auto game' },
@@ -62,6 +62,7 @@ export function Settings(): React.JSX.Element {
   const [hotkeyRegistered, setHotkeyRegistered] = useState(() => hasDesktopApi())
   const [recordingHotkey, setRecordingHotkey] = useState(false)
   const [capture, setCapture] = useState<CaptureStatus | null>(null)
+  const [windows, setWindows] = useState<WindowInfo[]>([])
 
   useEffect(() => {
     if (!hasDesktopApi()) return
@@ -75,6 +76,11 @@ export function Settings(): React.JSX.Element {
       if (status.ready) void ipc.listAudioDevices().then(setAudioDevices)
     })
   }, [])
+
+  const windowMode = settings?.captureMode === 'window'
+  useEffect(() => {
+    if (windowMode && hasDesktopApi()) void ipc.listWindows().then(setWindows)
+  }, [windowMode])
 
   useEffect(() => {
     if (!recordingHotkey) return
@@ -107,6 +113,10 @@ export function Settings(): React.JSX.Element {
         description: error instanceof Error ? error.message : String(error)
       })
     }
+  }
+
+  function refreshWindows(): void {
+    if (hasDesktopApi()) void ipc.listWindows().then(setWindows)
   }
 
   async function browseOutput(): Promise<void> {
@@ -193,7 +203,25 @@ export function Settings(): React.JSX.Element {
                     items={captureModes}
                   />
                 </Row>
-                <Row label="Monitor">
+                {settings.captureMode === 'window' ? (
+                  <Row label="Window" hint="Followed by its app if the title changes">
+                    <FieldSelect
+                      value={settings.captureWindow}
+                      placeholder="Pick a window"
+                      onOpenChange={(open) => {
+                        if (open) refreshWindows()
+                      }}
+                      onValueChange={(captureWindow) => void patch({ captureWindow })}
+                      items={windowOptions(windows, settings.captureWindow)}
+                    />
+                  </Row>
+                ) : null}
+                <Row
+                  label="Monitor"
+                  hint={
+                    settings.captureMode === 'window' ? 'Sets the frame size of clips' : undefined
+                  }
+                >
                   <FieldSelect
                     value={String(settings.monitorIndex)}
                     onValueChange={(value) => void patch({ monitorIndex: Number(value) })}
@@ -439,11 +467,17 @@ function FieldSelect(props: {
   value: string
   onValueChange: (value: string) => void
   items: { value: string; label: string }[]
+  placeholder?: string
+  onOpenChange?: (open: boolean) => void
 }): React.JSX.Element {
   return (
-    <Select value={props.value} onValueChange={props.onValueChange}>
+    <Select
+      value={props.value}
+      onValueChange={props.onValueChange}
+      onOpenChange={props.onOpenChange}
+    >
       <SelectTrigger>
-        <SelectValue />
+        <SelectValue placeholder={props.placeholder} className="truncate" />
       </SelectTrigger>
       <SelectContent>
         {props.items.map((item) => (
@@ -464,6 +498,23 @@ function deviceOptions(devices: AudioDeviceInfo[], selected: string): AudioDevic
   }
   if (selected && !opts.some((item) => item.id === selected)) {
     opts.push({ id: selected, label: `${selected} (unavailable)` })
+  }
+  return opts
+}
+
+function windowOptions(
+  windows: WindowInfo[],
+  selected: string
+): { value: string; label: string }[] {
+  const opts = windows.map((window) => ({
+    value: window.id,
+    label: `${window.title} · ${window.exe}`
+  }))
+  if (selected && !opts.some((item) => item.value === selected)) {
+    const [title = '', , exe = ''] = selected
+      .split(':')
+      .map((part) => part.replaceAll('#3A', ':').replaceAll('#22', '#'))
+    opts.unshift({ value: selected, label: `${title || exe} (not open)` })
   }
   return opts
 }

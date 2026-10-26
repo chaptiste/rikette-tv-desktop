@@ -2,7 +2,7 @@
 
 use std::time::{Duration, Instant};
 
-use capture_protocol::{CaptureMode, CaptureTarget, DisplayInfo, StartRequest, TargetKind};
+use capture_protocol::{CaptureMode, CaptureTarget, DisplayInfo, StartRequest, TargetKind, WindowInfo};
 use libobs as sys;
 use serde_json::json;
 
@@ -12,6 +12,9 @@ use crate::win::fullscreen::{self, FullscreenApp};
 /// libobs `method` for monitor and window capture: Windows Graphics Capture, which works
 /// where DXGI duplication returns a 0x0 desktop.
 const WINDOWS_GRAPHICS_CAPTURE: i64 = 2;
+/// libobs window `priority`: match the executable first, so the window is still found when
+/// its title changes (a browser tab, a game's loading screen).
+const WINDOW_PRIORITY_EXE: i64 = 2;
 const UNHOOKED_LOG_TICKS: u32 = 5;
 const TICK: Duration = Duration::from_secs(1);
 
@@ -79,13 +82,27 @@ impl Scene {
             built.show_display();
         }
         if request.capture_mode == CaptureMode::Window {
+            let picked = WindowInfo::parse(&request.window)
+                .ok_or("Pick the window to record in Settings > Capture")?;
             let source = ffi::source_create(
                 "window_capture",
                 "Rikette Window",
-                &json!({ "capture_cursor": true, "method": WINDOWS_GRAPHICS_CAPTURE, "capture_audio": false }),
+                &json!({
+                    "window": picked.id,
+                    "priority": WINDOW_PRIORITY_EXE,
+                    "capture_cursor": true,
+                    "method": WINDOWS_GRAPHICS_CAPTURE,
+                    "capture_audio": false,
+                }),
             )
             .ok_or("Could not create window capture")?;
+            log::info!("[capture] window capture {}", picked.id);
             built.window = Some(add_scaled(scene, source, canvas));
+            built.target = CaptureTarget {
+                kind: TargetKind::Window,
+                title: if picked.title.is_empty() { picked.exe.clone() } else { picked.title },
+                exe: picked.exe,
+            };
         }
         unsafe { sys::obs_set_output_source(0, sys::obs_scene_get_source(scene)) };
         Ok(built)
@@ -296,6 +313,5 @@ fn obs_window_id(source: *mut sys::obs_source_t, app: &FullscreenApp) -> String 
     {
         return item.value;
     }
-    let escape = |s: &str| s.replace('#', "#22").replace(':', "#3A");
-    format!("{}:{}:{}", escape(&app.title), escape(&app.class_name), escape(&app.exe))
+    WindowInfo::new(&app.title, &app.class_name, &app.exe).id
 }

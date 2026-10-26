@@ -42,6 +42,8 @@ export const appSettingsSchema = z.object({
   bufferSec: bufferSecondsSchema,
   captureMode: captureModeSchema,
   monitorIndex: z.number().int().nonnegative(),
+  /** Window mode's window as OBS's `title:class:exe` id; empty until picked. */
+  captureWindow: z.string(),
   micEnabled: z.boolean(),
   desktopAudioId: z.string().min(1),
   micDeviceId: z.string().min(1),
@@ -73,6 +75,7 @@ export function defaultAppSettings(
     bufferSec: 60,
     captureMode: 'auto-game',
     monitorIndex: 0,
+    captureWindow: '',
     micEnabled: false,
     desktopAudioId: 'default',
     micDeviceId: 'default',

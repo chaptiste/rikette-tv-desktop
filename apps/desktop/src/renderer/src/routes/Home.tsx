@@ -96,7 +96,8 @@ export function Home(): React.JSX.Element {
   const live = mode === 'recording' || mode === 'saving'
   const target = capture?.captureTarget
   const capturingGame = target?.kind === 'game' && Boolean(target.exe)
-  const sourceName = capturingGame ? target.title || target.exe : 'Desktop'
+  const capturingWindow = target?.kind === 'window'
+  const sourceName = capturingGame || capturingWindow ? target.title || target.exe : 'Desktop'
   const hotkeyParts = formatHotkey(hotkey, hasDesktopApi() ? ipc.platform : 'win32').split(' + ')
 
   async function toggleBuffer(): Promise<void> {

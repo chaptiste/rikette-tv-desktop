@@ -157,6 +157,9 @@ pub struct StartRequest {
     pub capture_mode: CaptureMode,
     pub fallback_to_display: bool,
     pub monitor_index: u32,
+    /// Window mode: the window to record, as a [`WindowInfo::id`].
+    #[serde(default)]
+    pub window: String,
     pub mic_enabled: bool,
     pub mic_volume: u32,
     pub desktop_audio_id: String,
@@ -185,6 +188,7 @@ pub struct EncoderInfo {
 pub enum TargetKind {
     Game,
     Display,
+    Window,
 }
 
 /// What is being recorded right now.
@@ -202,6 +206,37 @@ impl CaptureTarget {
             exe: String::new(),
             title: "Desktop".into(),
         }
+    }
+}
+
+/// A window that window mode can record.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WindowInfo {
+    /// OBS's `title:class:exe` window id, stored in settings.
+    pub id: String,
+    pub title: String,
+    pub exe: String,
+}
+
+impl WindowInfo {
+    pub fn new(title: &str, class: &str, exe: &str) -> Self {
+        let escape = |s: &str| s.replace('#', "#22").replace(':', "#3A");
+        WindowInfo {
+            id: format!("{}:{}:{}", escape(title), escape(class), escape(exe)),
+            title: title.into(),
+            exe: exe.into(),
+        }
+    }
+
+    /// Reads back an id made by [`WindowInfo::new`] (or by OBS).
+    pub fn parse(id: &str) -> Option<Self> {
+        let unescape = |s: &str| s.replace("#3A", ":").replace("#22", "#");
+        let mut parts = id.split(':');
+        let (title, _class, exe) = (parts.next()?, parts.next()?, parts.next()?);
+        if parts.next().is_some() {
+            return None;
+        }
+        Some(WindowInfo { id: id.into(), title: unescape(title), exe: unescape(exe) })
     }
 }
 
@@ -247,6 +282,8 @@ pub enum Call {
     Save,
     /// Replies with [`AudioDevices`].
     ListAudioDevices,
+    /// Replies with the [`WindowInfo`]s window mode can record.
+    ListWindows,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -299,6 +336,14 @@ mod tests {
         let line = serde_json::to_string(&message).unwrap();
         assert_eq!(line, r#"{"kind":"call","id":7,"method":"save"}"#);
         assert_eq!(serde_json::from_str::<ToHost>(&line).unwrap(), message);
+    }
+
+    #[test]
+    fn window_ids_escape_like_obs() {
+        let window = WindowInfo::new("Game: #1", "UnityWndClass", "game.exe");
+        assert_eq!(window.id, "Game#3A #221:UnityWndClass:game.exe");
+        assert_eq!(WindowInfo::parse(&window.id), Some(window));
+        assert_eq!(WindowInfo::parse("no-colons"), None);
     }
 
     #[test]

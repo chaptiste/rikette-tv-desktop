@@ -93,6 +93,11 @@ pub async fn settings_audio_devices() -> capture_protocol::AudioDevices {
 }
 
 #[tauri::command]
+pub async fn settings_windows() -> Vec<capture_protocol::WindowInfo> {
+    engine::list_windows().await
+}
+
+#[tauri::command]
 pub async fn settings_pick_output_folder() -> AppSettings {
     let current = settings::load();
     let (tx, rx) = tokio::sync::oneshot::channel();
@@ -306,6 +311,7 @@ pub fn handler() -> impl Fn(tauri::ipc::Invoke) -> bool + Send + Sync + 'static 
         settings_hotkey_status,
         settings_displays,
         settings_audio_devices,
+        settings_windows,
         settings_pick_output_folder,
         capture_status,
         capture_pause,

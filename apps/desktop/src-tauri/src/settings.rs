@@ -41,6 +41,9 @@ pub struct AppSettings {
     pub buffer_sec: u32,
     pub capture_mode: CaptureMode,
     pub monitor_index: u32,
+    /// Window mode's window, as a `capture_protocol::WindowInfo` id; empty until picked.
+    #[serde(default)]
+    pub capture_window: String,
     pub mic_enabled: bool,
     pub desktop_audio_id: String,
     pub mic_device_id: String,
@@ -68,6 +71,7 @@ impl AppSettings {
             buffer_sec: 60,
             capture_mode: CaptureMode::AutoGame,
             monitor_index: 0,
+            capture_window: String::new(),
             mic_enabled: false,
             desktop_audio_id: "default".into(),
             mic_device_id: "default".into(),

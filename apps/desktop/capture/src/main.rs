@@ -112,6 +112,7 @@ impl Backend for Unavailable {
         match call {
             Call::Stop | Call::Shutdown => Ok(serde_json::Value::Null),
             Call::ListAudioDevices => Ok(serde_json::to_value(capture_protocol::AudioDevices::default()).unwrap()),
+            Call::ListWindows => Ok(serde_json::Value::Array(Vec::new())),
             _ => Err("Capture is only available on Windows for now".into()),
         }
     }

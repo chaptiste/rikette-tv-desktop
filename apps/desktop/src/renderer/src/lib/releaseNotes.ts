@@ -11,6 +11,15 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.10',
+    date: '2026-10-26',
+    title: 'Pick the window to record',
+    items: [
+      'Window mode now lets you choose exactly which window to record, from a list of your open windows in Settings > Capture.',
+      'Rikette keeps following that window when its title changes, and Replay shows its name as the source.'
+    ]
+  },
+  {
     version: '0.2.8',
     date: '2026-10-26',
     title: 'Clip it fix',

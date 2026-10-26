@@ -6,7 +6,7 @@ use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
 use anyhow::{bail, Result};
-use capture_protocol::{AudioDevices, CaptureTarget, EncoderInfo, StartRequest};
+use capture_protocol::{AudioDevices, CaptureTarget, EncoderInfo, StartRequest, WindowInfo};
 use serde::Serialize;
 use tokio::sync::mpsc;
 
@@ -243,6 +243,16 @@ pub async fn list_audio_devices() -> AudioDevices {
     }
 }
 
+pub async fn list_windows() -> Vec<WindowInfo> {
+    match remote::list_windows().await {
+        Ok(windows) => windows,
+        Err(error) => {
+            log::warn!("[rikette] window list failed: {error:#}");
+            Vec::new()
+        }
+    }
+}
+
 pub fn set_mic_volume(percent: u32) {
     remote::set_mic_volume(percent);
 }
@@ -276,6 +286,7 @@ pub fn capture_changed(prev: &AppSettings, next: &AppSettings) -> bool {
     prev.buffer_sec != next.buffer_sec
         || prev.capture_mode != next.capture_mode
         || prev.monitor_index != next.monitor_index
+        || prev.capture_window != next.capture_window
         || prev.mic_enabled != next.mic_enabled
         || prev.fps != next.fps
         || prev.quality != next.quality
@@ -306,6 +317,7 @@ fn start_request(settings: &AppSettings) -> StartRequest {
         capture_mode: settings.capture_mode,
         fallback_to_display: settings.fallback_to_display,
         monitor_index: settings.monitor_index,
+        window: settings.capture_window.clone(),
         mic_enabled: settings.mic_enabled,
         mic_volume: settings.mic_volume,
         desktop_audio_id: settings.desktop_audio_id.clone(),

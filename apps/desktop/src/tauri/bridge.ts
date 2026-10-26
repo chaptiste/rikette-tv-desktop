@@ -37,6 +37,7 @@ const api: EchoFrameApi = {
   hotkeyRegistered: () => invoke('settings_hotkey_status'),
   listDisplays: () => invoke('settings_displays'),
   listAudioDevices: () => invoke('settings_audio_devices'),
+  listWindows: () => invoke('settings_windows'),
   pickOutputFolder: () => invoke('settings_pick_output_folder'),
   getCaptureStatus: () => invoke('capture_status'),
   pauseBuffer: () => invoke('capture_pause'),

@@ -252,6 +252,7 @@ impl Backend for ObsBackend {
             Call::ListAudioDevices => {
                 Ok(serde_json::to_value(audio::list_devices(self.pipeline.as_ref().map(|p| &p.audio))).unwrap_or_default())
             }
+            Call::ListWindows => Ok(serde_json::to_value(win::window_list::list()).unwrap_or_default()),
         }
     }
 

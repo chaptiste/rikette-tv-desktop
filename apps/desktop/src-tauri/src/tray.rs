@@ -67,7 +67,7 @@ pub fn create() -> tauri::Result<()> {
     Ok(())
 }
 
-/// Follow the capture status: pause label and the game in the tooltip.
+/// Follow the capture status: pause label and the game or window in the tooltip.
 pub fn refresh() {
     let tray = TRAY.lock().unwrap();
     let Some(tray) = tray.as_ref() else { return };
@@ -76,7 +76,7 @@ pub fn refresh() {
         .pause
         .set_text(if status.paused { "Resume buffering" } else { "Pause buffering" });
     let target = &status.capture_target;
-    let tooltip = if target.kind == capture_protocol::TargetKind::Game && !target.exe.is_empty() {
+    let tooltip = if target.kind != capture_protocol::TargetKind::Display && !target.exe.is_empty() {
         format!("Rikette · {}", target.exe)
     } else {
         "Rikette".to_string()
