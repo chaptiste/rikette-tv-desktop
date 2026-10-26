@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { hasDesktopApi, ipc } from '@/lib/ipc'
 
 const links = [
-  { to: '/', label: 'Dashboard' },
+  { to: '/', label: 'Replay' },
   { to: '/library', label: 'Clips' },
   { to: '/editor', label: 'Editor' },
   { to: '/settings', label: 'Settings' },
@@ -62,7 +62,7 @@ export function TopNav(): React.JSX.Element {
       )}
     >
       <div className="flex items-center gap-2.5 border-r border-border px-4">
-        <AppLogo className="size-[22px] rounded-[4px]" />
+        <AppLogo className="size-[22px]" />
         <span className="display-title text-[18px]">Rikette</span>
       </div>
 

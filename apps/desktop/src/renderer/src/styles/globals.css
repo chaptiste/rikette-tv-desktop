@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@fontsource-variable/archivo/standard.css';
+@import '@fontsource-variable/jetbrains-mono/wght.css';
+@import '@fontsource-variable/geist/wght.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -36,50 +37,51 @@
   --radius-lg: var(--radius);
   --radius-xl: var(--radius);
   --radius-2xl: calc(var(--radius) * 1.5);
-  --font-sans: 'Archivo Variable', 'Segoe UI Variable Text', 'Segoe UI', ui-sans-serif, sans-serif;
-  --font-display: 'Archivo Variable', 'Segoe UI Variable Display', 'Segoe UI', sans-serif;
+  --font-sans: 'JetBrains Mono Variable', 'Cascadia Mono', Consolas, ui-monospace, monospace;
+  --font-display: 'Geist Variable', 'Segoe UI Variable Display', 'Segoe UI', sans-serif;
 }
 
-/* Instant replay: TV replay graphics on deep navy. One blue, the logo's red
- * for live, square corners, no blur, no gradients. Same palette as the website
- * (apps/web/src/theme.ts). Every colour in the app lives here. See design.md. */
+/* Instant replay, terminal cut: Tokyo Night colours, a mono UI with Geist
+ * titles, zero radius, flat hairline panels, bright blocks with dark ink.
+ * Same palette as the website (apps/web/src/theme.ts). Every colour in the app
+ * lives here. See design.md. */
 :root,
 .dark {
   color-scheme: dark;
-  --radius: 3px;
-  --background: #070b15;
-  --foreground: #e9edf6;
-  --card: #0c1220;
-  --card-foreground: #e9edf6;
-  --popover: #111a2c;
-  --popover-foreground: #e9edf6;
+  --radius: 0px;
+  --background: #1a1b26;
+  --foreground: #c0caf5;
+  --card: #1f2230;
+  --card-foreground: #c0caf5;
+  --popover: #24283b;
+  --popover-foreground: #c0caf5;
   /* replay blue: the one accent (filled buttons, selection, active tab) */
-  --primary: #2f6bff;
-  --primary-foreground: #ffffff;
-  --primary-hi: #4f82ff;
-  --primary-lo: #2458e0;
-  /* lighter blue for links and small accents on dark */
-  --highlight: #7fa6ff;
-  --secondary: #141d31;
-  --secondary-foreground: #e9edf6;
-  --muted: #0c1220;
-  --muted-foreground: #7f8bab;
-  --accent: #131c30;
-  --accent-foreground: #e9edf6;
-  --destructive: #ff4d5e;
-  /* the red dot in the logo: live, REPLAY tags, the NOW line */
-  --rec: #ff2d3f;
-  --ok: #3ddc97;
-  --warn: #ffb547;
-  --border: #1c2740;
-  --border-strong: #2a3858;
-  --input: #0a101d;
-  --ring: #7fa6ff;
-  --sidebar: #070b15;
-  --sidebar-foreground: #e9edf6;
-  --sidebar-muted: #7f8bab;
+  --primary: #7aa2f7;
+  --primary-foreground: #16161e;
+  --primary-hi: #9ab8ff;
+  --primary-lo: #5a7fd6;
+  /* cyan for links and small accents */
+  --highlight: #7dcfff;
+  --secondary: #24283b;
+  --secondary-foreground: #c0caf5;
+  --muted: #1f2230;
+  --muted-foreground: #8b93b8;
+  --accent: #292e42;
+  --accent-foreground: #c0caf5;
+  --destructive: #ff8fa3;
+  /* live, REPLAY tags, the NOW line */
+  --rec: #f7768e;
+  --ok: #9ece6a;
+  --warn: #e0af68;
+  --border: #2a2e42;
+  --border-strong: #414868;
+  --input: #16161e;
+  --ring: #7dcfff;
+  --sidebar: #1a1b26;
+  --sidebar-foreground: #c0caf5;
+  --sidebar-muted: #8b93b8;
   /* scrim behind text laid over footage */
-  --scrim: rgb(7 11 21 / 82%);
+  --scrim: rgb(22 22 30 / 85%);
   --shadow: rgb(0 0 0 / 45%);
 }
 
@@ -106,7 +108,7 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-size: 13.5px;
+    font-size: 13px;
     user-select: none;
   }
   input,
@@ -158,24 +160,23 @@
 }
 
 @layer components {
-  /* Condensed heavy Archivo: titles, big numbers, button labels. */
+  /* Geist: titles, big numbers, names. */
   .font-display {
     font-family: var(--font-display);
-    font-stretch: 78%;
+    letter-spacing: -0.015em;
   }
   .display-title {
     font-family: var(--font-display);
-    font-weight: 800;
-    font-stretch: 72%;
-    letter-spacing: -0.012em;
-    line-height: 0.95;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
   }
   /* Small label: timecodes, units, section labels. */
   .eyebrow {
     font-family: var(--font-sans);
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
     color: var(--muted-foreground);
   }
@@ -184,7 +185,7 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Buttons: flat blocks with a condensed label. A press drops them a pixel. */
+  /* Buttons: flat blocks with a mono label. A press drops them a pixel. */
   .btn {
     --face: var(--primary);
     --face-hover: var(--primary-hi);
@@ -194,10 +195,9 @@
     padding-inline: 1.1em;
     background: var(--face);
     color: var(--legend);
-    font-family: var(--font-display);
-    font-stretch: 85%;
-    font-weight: 700;
-    letter-spacing: 0.005em;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: 0;
     transition:
       background-color 120ms linear,
       transform 80ms linear;
@@ -219,7 +219,7 @@
   .btn-danger {
     --face: var(--destructive);
     --face-hover: var(--rec);
-    --legend: #ffffff;
+    --legend: var(--primary-foreground);
   }
 
   /* Flat panel with a hairline border. */
@@ -234,11 +234,10 @@
   .bug {
     display: inline-flex;
     align-items: stretch;
-    font-family: var(--font-display);
-    font-stretch: 75%;
-    font-weight: 800;
-    font-size: 12px;
-    letter-spacing: 0.05em;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.04em;
     line-height: 1;
   }
   .bug > :first-child {
@@ -246,7 +245,7 @@
     align-items: center;
     padding: 4px 8px;
     background: var(--rec);
-    color: #ffffff;
+    color: var(--primary-foreground);
   }
   .bug > :nth-child(2) {
     display: flex;
@@ -282,12 +281,11 @@
     color: var(--primary-foreground);
   }
 
-  /* REC light: a hard on/off blink, not a glow. */
+  /* REC light: a square pixel with a hard on/off blink, not a glow. */
   .live-dot {
     display: inline-block;
     width: 8px;
     height: 8px;
-    border-radius: 99px;
     background: currentColor;
     animation: rec-blink 1.6s steps(1, end) infinite;
   }

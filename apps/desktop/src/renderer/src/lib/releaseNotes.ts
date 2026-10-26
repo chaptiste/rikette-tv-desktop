@@ -11,6 +11,16 @@ export interface ReleaseNote {
 
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.7',
+    date: '2026-10-26',
+    title: 'A new look',
+    items: [
+      'Rikette has a new look: Tokyo Night colours, a monospace interface with clean titles, square corners and a new pixel logo.',
+      'The Replay screen now shows the buffer status at the top (time held, game, video and encoder) with Clip it and Pause right there, and your eight most recent clips below.',
+      'New clips get a NEW tag and a blue outline for their first two minutes.'
+    ]
+  },
+  {
     version: '0.2.6',
     date: '2026-10-24',
     title: 'Your replays at a glance',

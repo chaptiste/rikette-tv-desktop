@@ -4,14 +4,16 @@
     <meta charset="UTF-8" />
     <title>Rikette overlay</title>
     <style>
-      /* Same Instant replay palette as src/styles/globals.css. */
+      /* Same palette as src/styles/globals.css. */
       :root {
-        --popover: #111a2c;
-        --foreground: #e9edf6;
-        --muted-foreground: #7f8bab;
-        --primary: #2f6bff;
-        --rec: #ff2d3f;
-        --display: 'Archivo Variable', 'Segoe UI', sans-serif;
+        --popover: #24283b;
+        --foreground: #c0caf5;
+        --muted-foreground: #8b93b8;
+        --primary: #7aa2f7;
+        --primary-foreground: #16161e;
+        --rec: #f7768e;
+        --mono: 'JetBrains Mono Variable', Consolas, monospace;
+        --display: 'Geist Variable', 'Segoe UI', sans-serif;
       }
       html,
       body {
@@ -47,11 +49,11 @@
         place-items: center;
         padding: 0 12px;
         background: var(--rec);
-        color: #ffffff;
-        font-size: 15px;
-        font-weight: 800;
-        font-stretch: 75%;
-        letter-spacing: 0.05em;
+        color: var(--primary-foreground);
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
       }
       .panel {
         position: relative;
@@ -68,7 +70,7 @@
       }
       .brand {
         color: var(--muted-foreground);
-        font-family: var(--display);
+        font-family: var(--mono);
         font-size: 10px;
         font-weight: 500;
         letter-spacing: 0.04em;
@@ -78,9 +80,9 @@
       .label {
         overflow: hidden;
         color: var(--foreground);
-        font-size: 22px;
-        font-weight: 800;
-        font-stretch: 72%;
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
         line-height: 24px;
         text-overflow: ellipsis;
         white-space: nowrap;

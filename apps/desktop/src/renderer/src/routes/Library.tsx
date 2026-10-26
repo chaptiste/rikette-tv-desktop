@@ -404,7 +404,7 @@ function ClipCard(props: {
           )}
           <span className="absolute inset-0 bg-[linear-gradient(0deg,var(--scrim),transparent_45%)]" />
           <span className="absolute inset-0 grid place-items-center opacity-0 transition-opacity duration-150 group-hover/card:opacity-100">
-            <span className="grid size-11 place-items-center bg-primary">
+            <span className="grid size-11 place-items-center bg-primary text-primary-foreground">
               <Play className="size-5 translate-x-px fill-primary-foreground text-primary-foreground" />
             </span>
           </span>

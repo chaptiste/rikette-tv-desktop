@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <title>Rikette</title>
     <style>
-      /* Same Instant replay palette as src/styles/globals.css. */
+      /* Same palette as src/styles/globals.css. */
       :root {
-        --background: #070b15;
-        --foreground: #e9edf6;
-        --muted-foreground: #7f8bab;
-        --secondary: #141d31;
-        --border: #1c2740;
-        --primary: #2f6bff;
-        --rec: #ff2d3f;
+        --background: #1a1b26;
+        --foreground: #c0caf5;
+        --muted-foreground: #8b93b8;
+        --secondary: #24283b;
+        --border: #2a2e42;
+        --primary: #7aa2f7;
+        --rec: #f7768e;
       }
       html,
       body {
@@ -22,7 +22,7 @@
         background: var(--background);
         color: var(--foreground);
         user-select: none;
-        font-family: 'Archivo Variable', 'Segoe UI', sans-serif;
+        font-family: 'Geist Variable', 'Segoe UI', sans-serif;
         -webkit-font-smoothing: antialiased;
         -webkit-app-region: drag;
       }
@@ -39,19 +39,17 @@
         width: 52px;
         height: 52px;
         margin-bottom: auto;
-        border-radius: 8px;
       }
       .brand {
-        font-size: 44px;
-        font-weight: 800;
-        font-stretch: 72%;
-        letter-spacing: -0.01em;
-        line-height: 0.9;
+        font-size: 40px;
+        font-weight: 600;
+        letter-spacing: -0.04em;
+        line-height: 1;
       }
       .status {
         min-height: 14px;
         color: var(--muted-foreground);
-        font-family: 'Archivo Variable', 'Segoe UI', sans-serif;
+        font-family: 'JetBrains Mono Variable', Consolas, monospace;
         font-size: 10.5px;
         line-height: 14px;
         text-transform: uppercase;
@@ -62,7 +60,6 @@
         width: 7px;
         height: 7px;
         margin-right: 8px;
-        border-radius: 50%;
         background: var(--rec);
         vertical-align: 1px;
         animation: blink 1.6s steps(1, end) infinite;

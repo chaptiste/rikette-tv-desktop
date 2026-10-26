@@ -60,7 +60,7 @@ pub fn create_main() -> tauri::Result<WebviewWindow> {
         .inner_size(1180.0, 760.0)
         .min_inner_size(960.0, 600.0)
         .visible(false)
-        .background_color(tauri::window::Color(0x07, 0x0b, 0x15, 0xff))
+        .background_color(tauri::window::Color(0x1a, 0x1b, 0x26, 0xff))
         // Tauri's native file-drop handler swallows HTML5 drag events on Windows,
         // which breaks dragging clips onto folders in the library.
         .disable_drag_drop_handler()

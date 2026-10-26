@@ -29,7 +29,7 @@ export function RecChip(): React.JSX.Element {
       {view.live ? (
         <span className="live-dot" />
       ) : (
-        <span className="size-2 rounded-full bg-current opacity-60" />
+        <span className="size-2 bg-current opacity-60" />
       )}
       <span className="text-foreground">{view.label}</span>
       {mode === 'recording' && capture ? (

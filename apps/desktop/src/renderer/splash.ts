@@ -1,4 +1,5 @@
-import '@fontsource-variable/archivo/standard.css'
+import '@fontsource-variable/jetbrains-mono/wght.css'
+import '@fontsource-variable/geist/wght.css'
 
 function setStatus(label: string, percent: number | null): void {
   const status = document.querySelector('.status')

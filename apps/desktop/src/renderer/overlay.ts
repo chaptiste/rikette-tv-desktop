@@ -1,4 +1,5 @@
-import '@fontsource-variable/archivo/standard.css'
+import '@fontsource-variable/jetbrains-mono/wght.css'
+import '@fontsource-variable/geist/wght.css'
 
 let hideTimer: ReturnType<typeof setTimeout> | null = null
 let audio: HTMLAudioElement | null = null

@@ -20,7 +20,7 @@ pub fn show() {
         .maximizable(false)
         .center()
         .additional_browser_args(window::BROWSER_ARGS)
-        .background_color(tauri::window::Color(0x07, 0x0b, 0x15, 0xff))
+        .background_color(tauri::window::Color(0x1a, 0x1b, 0x26, 0xff))
         .on_page_load(|win, payload| {
             if payload.event() == PageLoadEvent::Finished {
                 let _ = win.show();
